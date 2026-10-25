@@ -1,0 +1,12 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+node_modules/
+frontend/dist/
+/data/
+knowledge/sources/
+knowledge/custom/*
+!knowledge/custom/README.md
+.DS_Store

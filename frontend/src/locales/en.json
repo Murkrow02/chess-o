@@ -1,0 +1,155 @@
+{
+  "app": {
+    "name": "chess-o",
+    "tagline": "Review your games with Giacomino, a fish who lives in the engine."
+  },
+  "nav": {
+    "review": "Review",
+    "drills": "Drills",
+    "profile": "Profile",
+    "newGame": "New game",
+    "themeTitle": "Switch between system, light and dark theme",
+    "theme": {
+      "auto": "Theme: system",
+      "light": "Theme: light",
+      "dark": "Theme: dark"
+    }
+  },
+  "home": {
+    "title": "Which game should we look at?",
+    "pasteTab": "Paste PGN",
+    "importTab": "Import by username",
+    "pgnPlaceholder": "Paste a PGN here, or drop a .pgn file",
+    "upload": "Upload a file",
+    "analyze": "Analyze game",
+    "site": "Site",
+    "username": "Username",
+    "fetch": "Find games",
+    "noGames": "No public games found for this username.",
+    "recent": "Recently reviewed",
+    "empty": "Nothing reviewed yet. Paste your first game above.",
+    "youAre": "You played",
+    "white": "White",
+    "black": "Black",
+    "neither": "Just watching"
+  },
+  "analyzing": {
+    "scan": "Giacomino is swimming through every position",
+    "deep": "Taking a deeper look at the key moments",
+    "done": "Done"
+  },
+  "summary": {
+    "title": "Game review",
+    "players": "Players",
+    "accuracy": "Accuracy",
+    "estimate": "Game rating",
+    "estimateHint": "Rough estimate from this game only",
+    "start": "Start review",
+    "keyMoments": "Review key moments",
+    "opening": "Opening",
+    "turn": " The game swung on {move}.",
+    "better": "You were the sharper fish today.",
+    "worse": "Your opponent swam a little cleaner this time.",
+    "close": "A close one, fin to fin.",
+    "neutral": "Accuracy {white} for White and {black} for Black."
+  },
+  "classes": {
+    "brilliant": "Brilliant",
+    "great": "Great",
+    "best": "Best",
+    "excellent": "Excellent",
+    "good": "Good",
+    "book": "Book",
+    "inaccuracy": "Inaccuracy",
+    "mistake": "Mistake",
+    "miss": "Miss",
+    "blunder": "Blunder"
+  },
+  "verdict": {
+    "brilliant": "{san} is brilliant",
+    "great": "{san} is a great move",
+    "best": "{san} is best",
+    "excellent": "{san} is excellent",
+    "good": "{san} is good",
+    "book": "{san} is a book move",
+    "inaccuracy": "{san} is an inaccuracy",
+    "mistake": "{san} is a mistake",
+    "miss": "{san} is a miss",
+    "blunder": "{san} is a blunder"
+  },
+  "review": {
+    "start": "Here is the starting position. Press the right arrow and let's dive in.",
+    "retry": "Retry",
+    "showBest": "Show best",
+    "hideBest": "Hide best",
+    "next": "Next",
+    "prev": "Previous",
+    "hint": "Hint",
+    "backToGame": "Back to game",
+    "exploring": "Exploring a variation",
+    "retryPrompt": "Your turn: find a better move than {san}.",
+    "bestWas": "Best was {san}",
+    "keyMoment": "Key moment",
+    "summary": "Summary",
+    "thinking": "Giacomino is thinking",
+    "coachOffline": "The coach is offline, so this is the short version.",
+    "sources": "From the library",
+    "flip": "Flip board",
+    "sound": "Sound",
+    "keyboard": "Arrow keys move through the game",
+    "first": "First move",
+    "last": "Last move",
+    "soundOn": "Sound on",
+    "soundOff": "Sound off"
+  },
+  "drills": {
+    "title": "Your drill deck",
+    "intro": "Positions where you went wrong, back for another try. Spaced repetition brings each one back just before you would forget it.",
+    "due": "{n} due now",
+    "none": "Nothing due. Review a game and your mistakes will show up here.",
+    "find": "Find the best move for {side}.",
+    "again": "Again",
+    "hard": "Hard",
+    "good": "Good",
+    "easy": "Easy",
+    "reveal": "Show solution",
+    "correct": "That's it!",
+    "wrong": "Not this one. Try again or show the solution.",
+    "from": "From your game against {opponent}"
+  },
+  "profile": {
+    "title": "Where you lose points",
+    "intro": "Built from the games you reviewed as a player.",
+    "byPhase": "By game phase",
+    "byTheme": "By tactical pattern",
+    "games": "Games",
+    "avgAccuracy": "Average accuracy",
+    "empty": "Review a few of your games first, choosing which side you played.",
+    "lost": "Points lost per move"
+  },
+  "errors": {
+    "pgn": "This PGN could not be read: {message}",
+    "network": "The server did not answer. Check that the backend is running.",
+    "import": "Could not fetch games: {message}"
+  },
+  "coach": {
+    "looks": "Giacomino looks {mood}"
+  },
+  "phases": {
+    "opening": "Opening",
+    "middlegame": "Middlegame",
+    "endgame": "Endgame"
+  },
+  "themes": {
+    "fork": "Fork",
+    "pin": "Pin",
+    "skewer": "Skewer",
+    "discovered attack": "Discovered attack",
+    "discovered check": "Discovered check",
+    "back rank": "Back rank",
+    "promotion": "Promotion",
+    "sacrifice": "Sacrifice",
+    "checkmate": "Checkmate",
+    "castling": "Castling"
+  }
+}

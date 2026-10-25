@@ -1,0 +1,22 @@
+services:
+  backend:
+    build: ./backend
+    env_file: .env
+    environment:
+      DATA_DIR: /data
+      KNOWLEDGE_DIR: /knowledge
+    volumes:
+      - chesso-data:/data
+      - ./knowledge:/knowledge
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "${CHESSO_PORT:-8080}:80"
+    restart: unless-stopped
+
+volumes:
+  chesso-data:
