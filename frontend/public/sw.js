@@ -1,6 +1,6 @@
 // chess-o service worker: makes the app installable and opens it instantly.
 // The app shell is cached; /api is never cached, analysis always comes from the server.
-const CACHE = "chesso-v1";
+const CACHE = "chesso-v2";
 const SHELL = ["/", "/manifest.webmanifest", "/favicon.svg", "/icons/icon-192.png"];
 
 self.addEventListener("install", (event) => {

@@ -23,7 +23,7 @@ export function Ask({ base, intro }: { base: string; intro: string }) {
   }, [base]);
 
   useEffect(() => {
-    end.current?.scrollIntoView({ block: "nearest" });
+    if (turns.length) end.current?.scrollIntoView({ block: "nearest" });  // never jump on an empty thread
   }, [turns]);
 
   const save = (next: Turn[]) => {
