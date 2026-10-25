@@ -14,9 +14,16 @@ services:
     build: ./frontend
     depends_on:
       - backend
+    environment:
+      # Names and IPs the HTTPS certificate is issued for, comma separated
+      TLS_HOSTS: ${TLS_HOSTS:-localhost,127.0.0.1}
     ports:
       - "${CHESSO_PORT:-8080}:80"
+      - "${CHESSO_HTTPS_PORT:-8443}:443"
+    volumes:
+      - chesso-certs:/certs
     restart: unless-stopped
 
 volumes:
   chesso-data:
+  chesso-certs:

@@ -59,8 +59,8 @@ account, and without a chatbot inventing variations. chess-o keeps the two jobs 
 
 **Everywhere**
 - English and Italian, switchable in the top bar; Giacomino answers in the same language.
-- Works on phones and installs as an app (PWA). Installing needs HTTPS, for example behind
-  your reverse proxy; over plain HTTP the app still works in the browser.
+- Works on phones and installs as an app (PWA). Installing needs HTTPS; the container
+  serves it out of the box, see [HTTPS on a private network](#https-on-a-private-network).
 - "Delete all data" on the Profile page wipes games, reviews, drills and the linked account.
 
 <table>
@@ -118,7 +118,9 @@ All settings live in `.env` (git-ignored). The main ones:
 | `ENGINE_WORKERS` | `0` | Stockfish processes; 0 means CPU cores minus one |
 | `ENGINE_DEPTH`, `ENGINE_DEEP_DEPTH` | `14`, `20` | Full-game pass and key-moment pass |
 | `ENGINE_MULTIPV` | `3` | Candidate lines per position |
-| `CHESSO_PORT` | `8080` | Port of the web UI |
+| `CHESSO_PORT` | `8080` | Port of the web UI (HTTP) |
+| `CHESSO_HTTPS_PORT` | `8443` | Port of the web UI (HTTPS) |
+| `TLS_HOSTS` | `localhost,127.0.0.1` | Names and IPs in the HTTPS certificate |
 
 **Picking a model.** A 4B instruct model is the sweet spot on modest hardware: on an AMD 680M
 iGPU, `qwen3:4b-instruct-2507` starts answering in about a second and streams around
@@ -132,6 +134,27 @@ ollama create chesso-coach -f Modelfile   # then LLM_MODEL=chesso-coach
 
 If the coach and the embeddings share one Ollama, set `OLLAMA_MAX_LOADED_MODELS=2` there so
 the two models do not keep evicting each other.
+
+## HTTPS on a private network
+
+Browsers only install a PWA over HTTPS. The frontend container serves HTTPS on
+`CHESSO_HTTPS_PORT` (default 8443) with a certificate signed by its own small certificate
+authority, created on first start and kept in the `chesso-certs` volume.
+
+1. Put the address you open the app at in `.env`, e.g. `TLS_HOSTS=192.168.1.20,chess.lan`, and
+   run `docker compose up -d`. The certificate is re-issued whenever `TLS_HOSTS` changes.
+2. Download the authority from `http://<host>:8080/ca.crt` and trust it once per device:
+   - **iPhone/iPad**: open the file, install the profile in Settings, then enable it under
+     Settings > General > About > Certificate Trust Settings.
+   - **Android**: Settings > Security > Encryption & credentials > Install a certificate > CA certificate.
+   - **macOS**: open it in Keychain Access and set it to "Always Trust". **Windows**: install it
+     into "Trusted Root Certification Authorities".
+3. Open `https://<host>:8443` and install the app from the browser menu.
+
+A plain self-signed certificate with a click-through warning is not enough: browsers refuse
+to register the service worker on an untrusted certificate. To use your own certificate
+instead, put `cert.pem` and `key.pem` in the `chesso-certs` volume and delete `.generated`.
+The authority's private key never leaves that volume; keep it to yourself.
 
 ## Your own books and notes
 
