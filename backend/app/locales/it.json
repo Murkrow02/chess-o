@@ -65,7 +65,7 @@
   "background": "BACKGROUND (general chess knowledge: borrow at most one idea if it fits this move, and never name a move from it)",
   "ask": {
     "rules": "You are now answering a follow-up question from the player about this move. Answer only from FACTS and ASKED MOVES. If the facts do not cover the question, say so honestly and suggest trying the move on the board. If the question is not about chess, steer back to the game in one friendly sentence.",
-    "task": "The player asks: \"{question}\" Answer in 1 to 4 short sentences.",
+    "task": "The player asks: \"{question}\" Answer in 1 to 4 short sentences. Answer in Italian, whatever language the question is in.",
     "fallback": "Per risponderti dovrei inventarmi delle varianti, e i pesci non mentono. Prova la mossa sulla scacchiera e la controllo col motore.",
     "offline": "La mia bolla di parole è scoppiata: il modello del coach non è raggiungibile. I fatti del motore qui sopra restano validi."
   },
