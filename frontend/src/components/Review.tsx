@@ -16,7 +16,7 @@ import { Board, type BoardMove } from "./Board";
 import { ClassIcon, classIconSvg } from "./ClassIcon";
 import { EvalBar } from "./EvalBar";
 import { EvalGraph } from "./EvalGraph";
-import { Giacomino, moodFor } from "./Giacomino";
+import { Giacomino, moodFor, type Mood } from "./Giacomino";
 import { MoveList } from "./MoveList";
 import { Summary } from "./Summary";
 import { Icon } from "./Icon";
@@ -55,7 +55,7 @@ export function Review() {
 
   // Coach text for whatever is on screen.
   const coachUrl = useMemo(() => {
-    if (!analysis || !game) return null;
+    if (!analysis || !game || !s.talk) return null;
     if (mode === "explore" && explore && explore.cursor > 0) {
       const m = explore.moves[explore.cursor - 1];
       const before = explore.cursor === 1 ? fenAt(explore.basePly) : explore.moves[explore.cursor - 2].fen;
@@ -63,7 +63,7 @@ export function Review() {
     }
     if (mode === "review" && ply > 0) return `/api/games/${game.id}/coach/${ply}?kind=${showBest && !f?.is_best ? "best" : "move"}`;
     return null;
-  }, [analysis, game, mode, explore, ply, showBest, side]);
+  }, [analysis, game, mode, explore, ply, showBest, side, s.talk]);
   const coach = useCoach(coachUrl);
   const askBase = coachUrl && (mode === "explore"
     ? coachUrl.replace("/api/coach/explore?", "/api/coach/explore/ask?")
@@ -190,7 +190,11 @@ export function Review() {
           <Summary analysis={analysis} />
         ) : (
           <>
-            <div className="coach-row">
+            {!s.talk && mode !== "retry" ? (
+              <Quiet mood={moodFor(header?.cls, false)} header={header}
+                best={!showBest && f && !f.is_best && f.best_move_san ? t("review.bestWas", { san: f.best_move_san }) : undefined}
+                start={ply === 0 && mode === "review" ? t("review.start") : undefined} />
+            ) : <div className="coach-row">
               <Giacomino mood={mode === "retry" ? (retry?.verdict === "correct" ? "wow" : retry?.verdict === "wrong" ? "worried" : "thinking") : moodFor(header?.cls, thinking)} />
               <div className={`bubble ${header?.cls ? `b-${header.cls}` : ""}`} aria-live="polite">
                 {header && (
@@ -212,7 +216,7 @@ export function Review() {
                 )}
                 {askBase && mode !== "retry" && !coach.streaming && coach.text && <Ask base={askBase} intro={coach.text} />}
               </div>
-            </div>
+            </div>}
             <Actions f={f} />
             <MoveList moves={moves} facts={facts} />
             <EvalGraph wins={analysis.wins} facts={facts} ply={ply} onPick={s.setPly} />
@@ -258,6 +262,28 @@ function Actions({ f }: { f?: Facts }) {
   );
 }
 
+type Header = { cls?: Facts["classification"] | "best"; title: string; ev?: Score } | null;
+
+/** Giacomino without words: a big fish whose face and badge tell the verdict. */
+function Quiet({ mood, header, best, start }: { mood: Mood; header: Header; best?: string; start?: string }) {
+  return (
+    <div className={`quiet ${header?.cls ? `b-${header.cls}` : ""}`} aria-live="polite">
+      <div className="quiet-fish">
+        <Giacomino mood={mood} size={168} />
+        {header?.cls && <span className="quiet-badge"><ClassIcon cls={header.cls} size={40} /></span>}
+      </div>
+      {header && (
+        <p className="quiet-verdict">
+          <strong>{header.title}</strong>
+          {header.ev && <span className="ev-chip">{evalLabel(header.ev)}</span>}
+        </p>
+      )}
+      {best && <p className="quiet-best">{best}</p>}
+      {start && <p className="quiet-best">{start}</p>}
+    </div>
+  );
+}
+
 /** Bubbles under the Next button: how many of the next moves Giacomino has already explained. */
 function Ahead({ id, ply }: { id: string; ply: number }) {
   const [states, setStates] = useState<AheadState[]>([]);
@@ -290,13 +316,15 @@ function NavBar() {
       <button aria-label={t("review.first")} onClick={() => s.setPly(0)}><Icon name="first" /></button>
       <button aria-label={t("review.prev")} onClick={() => s.step(-1)}><Icon name="prev" /></button>
       <button aria-label={t("review.next")} onClick={() => (s.mode === "summary" ? (s.setMode("review"), s.setPly(1)) : s.step(1))}>
-        <Icon name="fwd" />{s.game && s.analysis && s.mode === "review" && <Ahead id={s.game.id} ply={s.ply} />}
+        <Icon name="fwd" />{s.talk && s.game && s.analysis && s.mode === "review" && <Ahead id={s.game.id} ply={s.ply} />}
       </button>
       <button aria-label={t("review.last")} onClick={() => s.setPly(n)}><Icon name="last" /></button>
       <span className="spacer" />
       {s.analysis && s.mode !== "summary" && <button className="txt" title={t("review.summary")} aria-label={t("review.summary")} onClick={() => s.setMode("summary")}><Icon name="list" /></button>}
       <button className="txt" aria-pressed={sound} title={t(sound ? "review.soundOn" : "review.soundOff")} aria-label={t(sound ? "review.soundOn" : "review.soundOff")}
         onClick={() => { setSound(!sound); set(!sound); }}><Icon name={sound ? "soundOn" : "soundOff"} /></button>
+      <button className="txt" aria-pressed={!s.talk} title={t(s.talk ? "review.talkOn" : "review.talkOff")} aria-label={t(s.talk ? "review.talkOn" : "review.talkOff")}
+        onClick={() => s.setTalk(!s.talk)}><Icon name={s.talk ? "talkOn" : "talkOff"} /></button>
       <button className="txt" title={t("review.flip")} aria-label={t("review.flip")} onClick={s.flip}><Icon name="flip" /></button>
     </div>
   );

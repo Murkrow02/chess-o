@@ -23,6 +23,7 @@ interface State {
   keyOnly: boolean;
   explore: { basePly: number; moves: ExploreMove[]; cursor: number } | null;
   retry: { ply: number; hintLevel: number; hintSquare?: string; pieceSquare?: string; verdict?: string; text?: string } | null;
+  talk: boolean;  // false: no LLM text, Giacomino reacts with faces and icons only
 
   go: (view: View) => void;
   openGame: (id: string) => Promise<void>;
@@ -36,7 +37,16 @@ interface State {
   pushExplore: (m: ExploreMove) => void;
   exploreCursor: (cursor: number) => void;
   setRetry: (r: State["retry"]) => void;
+  setTalk: (on: boolean) => void;
 }
+
+const talkSaved = (() => {
+  try {
+    return localStorage.getItem("chesso.talk") !== "off";
+  } catch {
+    return true;
+  }
+})();
 
 let closeAnalysis: (() => void) | null = null;
 
@@ -56,6 +66,7 @@ export const useStore = create<State>((set, get) => ({
   keyOnly: false,
   explore: null,
   retry: null,
+  talk: talkSaved,
 
   go: (view) => {
     set({ view });
@@ -143,4 +154,13 @@ export const useStore = create<State>((set, get) => ({
   },
 
   setRetry: (retry) => set({ retry, mode: retry ? "retry" : "review", explore: null, showBest: false }),
+
+  setTalk: (on) => {
+    try {
+      localStorage.setItem("chesso.talk", on ? "on" : "off");
+    } catch {
+      /* private mode: keep it for this session only */
+    }
+    set({ talk: on });
+  },
 }));

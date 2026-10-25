@@ -103,7 +103,9 @@
     "last": "Ultima mossa",
     "soundOn": "Suono attivo",
     "soundOff": "Suono disattivato",
-    "ahead": "Giacomino ha letto avanti: pronte {n} delle prossime {total} mosse"
+    "ahead": "Giacomino ha letto avanti: pronte {n} delle prossime {total} mosse",
+    "talkOn": "Giacomino parla: tocca per solo espressioni",
+    "talkOff": "Solo espressioni: tocca per far parlare Giacomino"
   },
   "drills": {
     "title": "Il tuo mazzo di esercizi",

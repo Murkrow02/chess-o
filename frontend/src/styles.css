@@ -296,6 +296,12 @@ cg-board square.selected { background-color: rgba(247, 236, 89, .5); }
 
 /* ---------- coach ---------- */
 .coach-row { display: flex; align-items: flex-start; gap: 6px; }
+.quiet { display: grid; justify-items: center; gap: .35rem; padding: .75rem 0 .25rem; text-align: center; }
+.quiet-fish { position: relative; }
+.quiet-badge { position: absolute; top: -4px; right: -14px; filter: drop-shadow(0 2px 4px rgb(0 0 0 / .25)); }
+.quiet-badge svg { display: block; }
+.quiet-verdict { display: flex; align-items: center; gap: .5rem; margin: 0; font-size: 1.15rem; }
+.quiet-best { margin: 0; color: var(--muted); }
 .giacomino { flex: none; overflow: visible; }
 .giacomino-body { animation: bob 3.6s ease-in-out infinite; transform-origin: 60px 60px; }
 .giacomino-fin { animation: fin 1.2s ease-in-out infinite; transform-origin: 62px 68px; }

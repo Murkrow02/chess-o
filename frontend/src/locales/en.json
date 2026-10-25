@@ -103,7 +103,9 @@
     "last": "Last move",
     "soundOn": "Sound on",
     "soundOff": "Sound off",
-    "ahead": "Giacomino has read ahead: {n} of the next {total} moves ready"
+    "ahead": "Giacomino has read ahead: {n} of the next {total} moves ready",
+    "talkOn": "Giacomino talks: tap for faces only",
+    "talkOff": "Faces only: tap to let Giacomino talk"
   },
   "drills": {
     "title": "Your drill deck",
