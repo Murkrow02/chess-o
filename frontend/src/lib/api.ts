@@ -16,7 +16,16 @@ const post = (url: string, body: unknown) =>
 export const api = {
   createGame: (pgn: string) => json<GameInfo>(post("/api/games", { pgn })),
   game: (id: string) => json<Partial<Analysis> & { game: GameInfo }>(fetch(`/api/games/${id}`)),
-  games: () => json<{ id: string; headers: Record<string, string>; summary: Analysis["summary"] | null; created_at: number }[]>(fetch("/api/games")),
+  games: (params: { player?: string; analyzed?: boolean; limit?: number } = {}) =>
+    json<StoredGame[]>(fetch(`/api/games?${new URLSearchParams(
+      Object.entries(params).filter(([, v]) => v !== undefined).map(([k, v]) => [k, String(v)]))}`)),
+  account: () => json<{ account: Account | null }>(fetch("/api/account/chesscom")),
+  linkAccount: (username: string) =>
+    json<{ account: Account }>(fetch("/api/account/chesscom", {
+      method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username }) })),
+  unlinkAccount: () => json(fetch("/api/account/chesscom", { method: "DELETE" })),
+  syncAccount: (force = false) =>
+    json<{ account: Account; added: number }>(post(`/api/account/chesscom/sync?force=${force}`, {})),
   importGames: (site: string, user: string) =>
     json<{ pgn: string; white: string; black: string; result: string; date: number; speed: string; url: string }[]>(
       fetch(`/api/import/${site}/${encodeURIComponent(user)}`)),
@@ -32,7 +41,18 @@ export const api = {
   drillsStats: () => json<{ total: number; due: number }>(fetch("/api/drills/stats")),
   reviewDrill: (id: number, grade: number) => json(post(`/api/drills/${id}/review`, { grade })),
   profile: () => json<Profile>(fetch("/api/profile")),
+  clearData: () => json(fetch("/api/data", { method: "DELETE" })),
 };
+
+export interface StoredGame {
+  id: string; headers: Record<string, string>; summary: Analysis["summary"] | null; created_at: number;
+  side: "white" | "black" | null;
+}
+
+export interface Account {
+  username: string; name: string | null; avatar: string | null; url: string | null;
+  linked_at: number; last_end: number; checked_at: number;
+}
 
 export interface Drill {
   id: number; game_id: string; ply: number; fen: string; played_san: string;

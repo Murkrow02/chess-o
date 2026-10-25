@@ -105,6 +105,13 @@ class DB:
     def kv_set(self, key: str, value: Any) -> None:
         self.execute("INSERT OR REPLACE INTO kv (key, value) VALUES (?, ?)", (key, json.dumps(value)))
 
+    def clear_user_data(self) -> None:
+        """Games, reviews, drills, sides and the linked account. Engine cache and knowledge base stay."""
+        with self.lock:
+            for table in ("games", "coach_cache", "drills", "kv"):
+                self.conn.execute(f"DELETE FROM {table}")
+            self.conn.commit()
+
 
 db = DB(settings.db_path)
 

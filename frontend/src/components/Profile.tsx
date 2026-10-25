@@ -1,15 +1,32 @@
 import { useEffect, useState } from "react";
 import { api, type Profile as P } from "../lib/api";
 import { t } from "../lib/i18n";
+import { useStore } from "../lib/store";
 import { CLASSES } from "../lib/types";
 import { ClassIcon } from "./ClassIcon";
 import { Giacomino } from "./Giacomino";
+import { Icon } from "./Icon";
 
 export function Profile() {
   const [p, setP] = useState<P | null>(null);
+  const [confirming, setConfirming] = useState(false);
+  const [status, setStatus] = useState<string | null>(null);
+  const reload = () => api.profile().then(setP).catch(() => undefined);
   useEffect(() => {
-    api.profile().then(setP).catch(() => undefined);
+    reload();
   }, []);
+
+  const clear = async () => {
+    try {
+      await api.clearData();
+      useStore.setState({ gameId: null, game: null, analysis: null });
+      setStatus(t("profile.cleared"));
+      reload();
+    } catch (e) {
+      setStatus(t("errors.clear", { message: (e as Error).message }));
+    }
+    setConfirming(false);
+  };
   if (!p) return <div className="loading"><Giacomino mood="thinking" /></div>;
 
   const maxLoss = Math.max(1, ...p.by_phase.map((x) => x.avg_loss));
@@ -56,6 +73,21 @@ export function Profile() {
           </section>
         </>
       )}
+      <section className="danger-zone">
+        <h2>{t("profile.dataTitle")}</h2>
+        <p className="muted">{t("profile.dataIntro")}</p>
+        <div className="row">
+          {confirming ? (
+            <>
+              <button className="danger" onClick={clear}><Icon name="trash" />{t("profile.clearConfirm")}</button>
+              <button className="ghost" onClick={() => setConfirming(false)}>{t("profile.cancel")}</button>
+            </>
+          ) : (
+            <button className="ghost" onClick={() => { setStatus(null); setConfirming(true); }}><Icon name="trash" />{t("profile.clear")}</button>
+          )}
+        </div>
+        {status && <p className="muted" role="status">{status}</p>}
+      </section>
     </div>
   );
 }

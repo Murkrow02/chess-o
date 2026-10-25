@@ -20,6 +20,7 @@ import { Giacomino, moodFor } from "./Giacomino";
 import { MoveList } from "./MoveList";
 import { Summary } from "./Summary";
 import { Icon } from "./Icon";
+import { Ask } from "./Ask";
 
 function sanToUci(fen: string, san: string): string | null {
   const pos = Chess.fromSetup(parseFen(fen).unwrap()).unwrap();
@@ -64,6 +65,9 @@ export function Review() {
     return null;
   }, [analysis, game, mode, explore, ply, showBest, side]);
   const coach = useCoach(coachUrl);
+  const askBase = coachUrl && (mode === "explore"
+    ? coachUrl.replace("/api/coach/explore?", "/api/coach/explore/ask?")
+    : `/api/games/${game?.id}/ask/${ply}`);
 
   // Sounds when stepping through the game.
   useEffect(() => {
@@ -206,6 +210,7 @@ export function Review() {
                     <ul>{coach.sources.map((src, i) => <li key={i}>{src.url ? <a href={src.url} target="_blank" rel="noreferrer">{src.title}</a> : src.title} {src.license && <span className="lic">({src.license})</span>}</li>)}</ul>
                   </details>
                 )}
+                {askBase && mode !== "retry" && !coach.streaming && coach.text && <Ask base={askBase} intro={coach.text} />}
               </div>
             </div>
             <Actions f={f} />

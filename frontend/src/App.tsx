@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "./lib/api";
-import { t } from "./lib/i18n";
+import { lang, languages, setLang, t } from "./lib/i18n";
 import { useStore, type View } from "./lib/store";
 import { Icon, type IconName } from "./components/Icon";
 import { applyTheme, loadTheme, nextTheme } from "./lib/theme";
@@ -39,9 +39,10 @@ export function App() {
   }, [view]);
 
   const tab = (v: View, label: string, icon: IconName, badge?: number) => (
-    <button className={view === v ? "on" : ""} onClick={() => (v === "review" && gameId ? (location.hash = `#/game/${gameId}`) : go(v))}>
+    <button className={view === v ? "on" : ""} title={label} aria-label={label}
+      onClick={() => (v === "review" && gameId ? (location.hash = `#/game/${gameId}`) : go(v))}>
       <Icon name={icon} />
-      {label}
+      <span className="tab-label">{label}</span>
       {badge ? <span className="badge">{badge}</span> : null}
     </button>
   );
@@ -51,13 +52,17 @@ export function App() {
       <nav className="topbar">
         <button className="brand" onClick={() => go("home")} aria-label={t("nav.newGame")}>
           <img src="/favicon.svg" alt="" width="26" height="26" />
-          <span>{t("app.name")}</span>
+          <span className="brand-name">{t("app.name")}</span>
         </button>
         <div className="tabs-top">
           {tab("home", t("nav.newGame"), "plus")}
           {gameId && tab("review", t("nav.review"), "board")}
           {tab("drills", t("nav.drills"), "target", due)}
           {tab("profile", t("nav.profile"), "user")}
+          <select className="lang-select" value={lang} onChange={(e) => setLang(e.target.value)}
+            aria-label={t("nav.language")} title={t("nav.language")}>
+            {languages.map((l) => <option key={l.code} value={l.code}>{l.code.toUpperCase()}</option>)}
+          </select>
           <button className="theme-btn" onClick={() => setTheme(nextTheme(theme))}
             title={t(`nav.theme.${theme}`)} aria-label={t("nav.themeTitle")}>
             <Icon name={theme === "auto" ? "monitor" : theme === "light" ? "sun" : "moon"} />

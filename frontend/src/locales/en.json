@@ -1,7 +1,8 @@
 {
   "app": {
     "name": "chess-o",
-    "tagline": "Review your games with Giacomino, a fish who lives in the engine."
+    "tagline": "Review your games with Giacomino, a fish who lives in the engine.",
+    "language": "English"
   },
   "nav": {
     "review": "Review",
@@ -13,7 +14,8 @@
       "auto": "Theme: system",
       "light": "Theme: light",
       "dark": "Theme: dark"
-    }
+    },
+    "language": "Language"
   },
   "home": {
     "title": "Which game should we look at?",
@@ -125,12 +127,21 @@
     "games": "Games",
     "avgAccuracy": "Average accuracy",
     "empty": "Review a few of your games first, choosing which side you played.",
-    "lost": "Points lost per move"
+    "lost": "Points lost per move",
+    "dataTitle": "Your data",
+    "dataIntro": "Deletes every game, review, drill and the linked account from this server. The engine cache and the knowledge base stay, so nothing has to be rebuilt.",
+    "clear": "Delete all data",
+    "clearConfirm": "Yes, delete everything",
+    "cancel": "Cancel",
+    "cleared": "All data deleted."
   },
   "errors": {
     "pgn": "This PGN could not be read: {message}",
     "network": "The server did not answer. Check that the backend is running.",
-    "import": "Could not fetch games: {message}"
+    "import": "Could not fetch games: {message}",
+    "sync": "Could not sync with Chess.com: {message}",
+    "link": "Could not link the account: {message}",
+    "clear": "Could not delete the data: {message}"
   },
   "coach": {
     "looks": "Giacomino looks {mood}"
@@ -151,5 +162,41 @@
     "sacrifice": "Sacrifice",
     "checkmate": "Checkmate",
     "castling": "Castling"
+  },
+  "chesscom": {
+    "linkTitle": "Link your Chess.com account",
+    "linkIntro": "Your new games come in on their own, with your side already set. Only your public games are read; no password needed.",
+    "username": "Chess.com username",
+    "link": "Link account",
+    "synced": "Synced {when}",
+    "syncing": "Looking for new games…",
+    "sync": "Sync now",
+    "unlink": "Unlink",
+    "unlinkTitle": "Stop syncing. Games already imported stay.",
+    "justNow": "just now",
+    "minutesAgo": "{n} min ago",
+    "hoursAgo": "{n} h ago",
+    "added": "{n} new games imported.",
+    "upToDate": "No new games since the last sync.",
+    "noGames": "No games yet. Play one on Chess.com and sync.",
+    "win": "Won",
+    "loss": "Lost",
+    "draw": "Draw",
+    "vs": "vs {name}",
+    "notReviewed": "Not reviewed",
+    "more": "Show more",
+    "speed": {
+      "bullet": "Bullet",
+      "blitz": "Blitz",
+      "rapid": "Rapid",
+      "daily": "Daily"
+    },
+    "latest": "Review latest Chess.com game",
+    "fetchingLatest": "Fetching your latest game…"
+  },
+  "ask": {
+    "placeholder": "Ask Giacomino about this move",
+    "send": "Send",
+    "failed": "The answer got lost in the current. Try again."
   }
 }

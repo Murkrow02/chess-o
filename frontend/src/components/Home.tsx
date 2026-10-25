@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "../lib/api";
-import { t } from "../lib/i18n";
+import { lang, t } from "../lib/i18n";
 import { useStore } from "../lib/store";
 import type { Side } from "../lib/types";
+import { ChessCom, LatestButton } from "./ChessCom";
 import { Giacomino } from "./Giacomino";
 import { Icon } from "./Icon";
 
@@ -31,7 +32,7 @@ export function Home() {
   const file = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    api.games().then(setRecent).catch(() => undefined);
+    api.games({ analyzed: true }).then(setRecent).catch(() => undefined);
   }, []);
 
   const analyze = async (text: string, side?: Side | null) => {
@@ -80,6 +81,7 @@ export function Home() {
         <div>
           <h1>{t("home.title")}</h1>
           <p className="muted">{t("app.tagline")}</p>
+          <LatestButton />
         </div>
       </header>
 
@@ -122,7 +124,7 @@ export function Home() {
                       <span className={`pawn-chip black`} /> {g.black}
                       <span className="spacer" />
                       <span className="muted">{g.speed}</span>
-                      <span className="muted">{new Date(g.date).toLocaleDateString()}</span>
+                      <span className="muted">{new Date(g.date).toLocaleDateString(lang)}</span>
                     </button>
                   </li>
                 ))}
@@ -132,6 +134,8 @@ export function Home() {
         )}
         {error && <p className="error" role="alert">{error}</p>}
       </section>
+
+      <ChessCom />
 
       <section className="recent">
         <h2>{t("home.recent")}</h2>

@@ -56,10 +56,12 @@ def set_side(gid: str, side: str | None) -> None:
 # --- hints and retry -----------------------------------------------------------
 
 def hint(f: dict, level: int) -> dict:
-    h = load()["hints"]
+    loc = load()
+    h = loc["hints"]
     board = chess.Board(f["fen_before"])
     move = chess.Move.from_uci(f["best_move_uci"])
     piece = F.NAMES[board.piece_type_at(move.from_square)]
+    piece = loc.get("pieces", {}).get(piece, piece)
     square = chess.square_name(move.to_square)
     out: dict = {"piece_square": chess.square_name(move.from_square)}
     if level <= 1:
@@ -97,7 +99,7 @@ async def retry(f: dict, uci: str) -> dict:
     if loss <= 2:
         return {"verdict": "close", "san": san, "text": r["close"].format(san=san), "score": score}
     return {"verdict": "wrong", "san": san, "reply": reply, "score": score,
-            "text": r["wrong"].format(san=san, reply=reply or "a strong answer")}
+            "text": r["wrong"].format(san=san, reply=reply or r["strong_answer"])}
 
 
 # --- drills (SM-2 spaced repetition) ---------------------------------------------

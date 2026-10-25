@@ -5,16 +5,18 @@ from contextlib import asynccontextmanager
 
 import chess
 import httpx
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
 
-from . import analysis, importers, learning
+from . import account, analysis, importers, learning
+from .coach import ask
 from .coach.service import coach
 from .config import settings
 from .db import db
 from .engine import get_pool, start_pool
 from .rag import store as rag_store
+from .locale import available as locales, current as current_lang, lang as current_locale
 from .rag.ingest import ingest
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -48,6 +50,22 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="chess-o", lifespan=lifespan)
+
+
+@app.middleware("http")
+async def locale_from_cookie(request: Request, call_next):
+    code = request.query_params.get("lang") or request.cookies.get("chesso_lang")
+    token = current_lang.set(code if code in locales() else None)
+    try:
+        return await call_next(request)
+    finally:
+        current_lang.reset(token)
+
+
+def coach_key(extra: str = "") -> str:
+    """Coach texts are cached per language: English keeps the bare key so old caches stay valid."""
+    code = current_locale()
+    return extra if code == "en" else f"{extra}|{code}"
 
 
 def sse(gen):
@@ -99,10 +117,20 @@ async def create_game(body: PGNIn):
 
 
 @app.get("/api/games")
-async def list_games(limit: int = 30):
-    rows = db.all("SELECT id, headers, summary, created_at FROM games ORDER BY created_at DESC LIMIT ?", (limit,))
+async def list_games(limit: int = 30, player: str | None = None, analyzed: bool | None = None):
+    where, params = [], []
+    if player:
+        where.append("(lower(json_extract(headers, '$.White')) = ? OR lower(json_extract(headers, '$.Black')) = ?)")
+        params += [player.lower()] * 2
+    if analyzed is not None:
+        where.append("analysis IS NOT NULL" if analyzed else "analysis IS NULL")
+    sql = "SELECT id, headers, summary, created_at FROM games"
+    if where:
+        sql += " WHERE " + " AND ".join(where)
+    rows = db.all(sql + " ORDER BY created_at DESC LIMIT ?", (*params, limit))
     return [{"id": r["id"], "headers": json.loads(r["headers"]),
-             "summary": json.loads(r["summary"]) if r["summary"] else None, "created_at": r["created_at"]}
+             "summary": json.loads(r["summary"]) if r["summary"] else None, "created_at": r["created_at"],
+             "side": learning.get_side(r["id"])}
             for r in rows]
 
 
@@ -168,8 +196,8 @@ async def coach_move(gid: str, ply: int, kind: str = "move", prefetch: int = 2):
     side = learning.get_side(gid)
     _, result = analysis.load_game(gid)
     for nxt in range(ply + 1, min(ply + 1 + prefetch, len(result["facts"]) + 1)):
-        coach.prefetch((gid, nxt, "move", ""), result["facts"][nxt - 1], "move", side)
-    return sse(coach.stream((gid, ply, kind, ""), facts, kind, side))
+        coach.prefetch((gid, nxt, "move", coach_key()), result["facts"][nxt - 1], "move", side)
+    return sse(coach.stream((gid, ply, kind, coach_key()), facts, kind, side))
 
 
 @app.get("/api/coach/explore")
@@ -181,9 +209,35 @@ async def coach_explore(fen: str, uci: str, side: str | None = None):
 
     async def run():
         yield {"event": "facts", "data": facts}
-        async for item in coach.stream(("explore", 0, "explore", f"{fen}|{uci}"), facts, "explore", side):
+        async for item in coach.stream(("explore", 0, "explore", coach_key(f"{fen}|{uci}")), facts, "explore", side):
             yield item
     return sse(run())
+
+
+def _history(h: str) -> list[dict]:
+    try:
+        turns = json.loads(h) if h else []
+    except json.JSONDecodeError:
+        raise HTTPException(400, "h must be a JSON list")
+    return [t for t in turns if isinstance(t, dict)] if isinstance(turns, list) else []
+
+
+@app.get("/api/games/{gid}/ask/{ply}")
+async def ask_move(gid: str, ply: int, q: str, h: str = ""):
+    if not q.strip():
+        raise HTTPException(400, "Empty question")
+    return sse(ask.answer(_facts(gid, ply), learning.get_side(gid), q, _history(h)))
+
+
+@app.get("/api/coach/explore/ask")
+async def ask_explore(fen: str, uci: str, q: str, h: str = "", side: str | None = None):
+    if not q.strip():
+        raise HTTPException(400, "Empty question")
+    try:
+        facts = await learning.quick_facts(fen, uci)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
+    return sse(ask.answer(facts, side, q, _history(h)))
 
 
 @app.get("/api/games/{gid}/hint/{ply}")
@@ -234,6 +288,50 @@ async def engine_position(body: PositionIn):
         raise HTTPException(400, "Invalid FEN")
     lines = await get_pool().analyse(board, body.depth or settings.engine_depth, max(1, min(5, body.multipv)))
     return {"lines": [{**l, "san": analysis.pv_san(board, l["uci"])} for l in lines]}
+
+
+class AccountIn(BaseModel):
+    username: str
+
+
+@app.get("/api/account/chesscom")
+async def get_account():
+    return {"account": account.get()}
+
+
+@app.put("/api/account/chesscom")
+async def link_account(body: AccountIn):
+    if not body.username.strip():
+        raise HTTPException(400, "Username is empty")
+    try:
+        linked = await account.link(body.username)
+    except LookupError:
+        raise HTTPException(404, f"No Chess.com player called {body.username}")
+    except httpx.HTTPError as exc:
+        raise HTTPException(502, f"Chess.com did not answer: {exc}")
+    return {"account": linked}
+
+
+@app.delete("/api/account/chesscom")
+async def unlink_account():
+    account.unlink()
+    return {"account": None}
+
+
+@app.post("/api/account/chesscom/sync")
+async def sync_account(force: bool = False):
+    try:
+        return await account.sync(force)
+    except LookupError:
+        raise HTTPException(404, "No Chess.com account linked")
+    except httpx.HTTPError as exc:
+        raise HTTPException(502, f"Chess.com did not answer: {exc}")
+
+
+@app.delete("/api/data")
+async def clear_data():
+    db.clear_user_data()
+    return {"ok": True}
 
 
 @app.get("/api/import/{site}/{user}")

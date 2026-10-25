@@ -59,12 +59,12 @@ def positions_of(game: chess.pgn.Game) -> tuple[list[chess.Board], list[chess.Mo
     return boards, moves
 
 
-def store_game(pgn: str) -> dict:
+def store_game(pgn: str, created_at: float | None = None) -> dict:
     game = parse_pgn(pgn)
     gid = game_id(pgn)
     if not db.one("SELECT 1 FROM games WHERE id = ?", (gid,)):
         db.execute("INSERT INTO games (id, pgn, headers, created_at) VALUES (?, ?, ?, ?)",
-                   (gid, pgn.strip(), json.dumps(dict(game.headers)), now()))
+                   (gid, pgn.strip(), json.dumps(dict(game.headers)), created_at or now()))
     return game_payload(gid, game)
 
 

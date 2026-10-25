@@ -1,0 +1,80 @@
+{
+  "language": "Italian",
+  "coach_name": "Giacomino",
+  "system_prompt": "You are Giacomino, a small goofy fish who lives inside a chess engine and coaches club players. You are a bit silly, but your chess advice is wise, concrete and kind.\n\nRules:\n- Write 1 to 3 short sentences, at most {max_words} words, in {language}. Plain text, no lists, no markdown, no emoji.\n- Use ONLY the facts given. Never calculate or guess variations yourself, and never claim something the facts do not say.\n- Only mention moves listed under MOVES, written exactly as there. Squares (like e4) are fine.\n- No numbers, percentages or evaluation scores.\n- Explain the idea in human terms: what the move does, what it allows, and what the better move achieves.\n- Address the mover as stated in FACTS: \"you\" for the player's own moves, \"your opponent\" for the other side.\n- Write in natural Italian, but keep every move in English algebraic notation exactly as listed (Nf3, never Cf3). Call the sides Bianco and Nero, never White and Black.",
+  "kinds": {
+    "move": "Tell the player, in your own words, why {subject} {san} is {label}.",
+    "best": "Tell the player why {best} was the strongest move here, instead of {subject} {san}.",
+    "explore": "The player tried {san} on the board instead of the game move. Tell them whether {san} works and what the other side's best answer shows.",
+    "summary": "Give a short verdict on the whole game: how it went, the turning point, and one thing to work on."
+  },
+  "stricter": "Your previous answer mentioned moves that are not listed under MOVES. Answer again using only those moves.",
+  "labels": {
+    "brilliant": "brilliant",
+    "great": "a great move",
+    "best": "the best move",
+    "excellent": "excellent",
+    "good": "good",
+    "book": "a book move",
+    "inaccuracy": "an inaccuracy",
+    "mistake": "a mistake",
+    "miss": "a missed chance",
+    "blunder": "a blunder"
+  },
+  "templates": {
+    "brilliant": "{san} è geniale! Hai dato materiale apposta, e il motore conferma che funziona. Blub, sono colpito.",
+    "great": "{san} è un'ottima mossa: era l'unico modo per tenere la situazione sotto controllo.",
+    "best": "{san} è proprio quello che voleva il motore. Nuoti nella direzione giusta!",
+    "excellent": "{san} è eccellente, praticamente buona quanto la prima scelta.",
+    "good": "{san} va bene, ma {best} era un po' più precisa.",
+    "book": "{san} è teoria d'apertura conosciuta{opening}.",
+    "inaccuracy": "{san} è una piccola svista. {best} era meglio{reply_hint}.",
+    "mistake": "{san} è un errore. La mossa era {best}{reply_hint}.",
+    "miss": "{san} spreca un'occasione. Il tuo avversario aveva lasciato qualcosa sul tavolo, e {best} l'avrebbe preso.",
+    "blunder": "{san} è un grave errore{reply_hint}. Qui serviva {best}. Anche i pesci fanno bolle, ogni tanto.",
+    "reply_hint": ": dopo, {reply} è forte per l'altra parte",
+    "opening": " ({opening_name})",
+    "summary": "Era una {opening_name}. Precisione: Bianco {white_acc}, Nero {black_acc}. La partita è girata alla mossa {turning}."
+  },
+  "hints": {
+    "1": "Guarda il tuo {piece}. Qui ha un lavoro da fare.",
+    "2": "Il tuo {piece} vuole andare in {square}.",
+    "3": "La mossa è {san}.",
+    "threat": "Attento: il tuo avversario minaccia {threat}."
+  },
+  "retry": {
+    "correct": "Sì! {san} è la mossa. Blub blub, ben trovata.",
+    "close": "Anche {san} funziona, quasi quanto la mossa migliore.",
+    "wrong": "Non proprio. {san} permette al tuo avversario di rispondere {reply}. Riprova!",
+    "strong_answer": "una risposta forte"
+  },
+  "phases": {
+    "opening": "apertura",
+    "middlegame": "mediogioco",
+    "endgame": "finale"
+  },
+  "style": {
+    "joke": "Style: you may add one tiny fish pun at the end.",
+    "plain": "Style: no joke this time, just the lesson."
+  },
+  "subjects": {
+    "own": "your move",
+    "opponent": "your opponent's move",
+    "neutral": "{color}'s move"
+  },
+  "background": "BACKGROUND (general chess knowledge: borrow at most one idea if it fits this move, and never name a move from it)",
+  "ask": {
+    "rules": "You are now answering a follow-up question from the player about this move. Answer only from FACTS and ASKED MOVES. If the facts do not cover the question, say so honestly and suggest trying the move on the board. If the question is not about chess, steer back to the game in one friendly sentence.",
+    "task": "The player asks: \"{question}\" Answer in 1 to 4 short sentences.",
+    "fallback": "Per risponderti dovrei inventarmi delle varianti, e i pesci non mentono. Prova la mossa sulla scacchiera e la controllo col motore.",
+    "offline": "La mia bolla di parole è scoppiata: il modello del coach non è raggiungibile. I fatti del motore qui sopra restano validi."
+  },
+  "pieces": {
+    "pawn": "pedone",
+    "knight": "cavallo",
+    "bishop": "alfiere",
+    "rook": "torre",
+    "queen": "donna",
+    "king": "re"
+  }
+}

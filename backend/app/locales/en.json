@@ -45,7 +45,8 @@
   "retry": {
     "correct": "Yes! {san} is the move. Blub blub, well found.",
     "close": "{san} works too, almost as good as the best move.",
-    "wrong": "Not quite. {san} lets your opponent answer {reply}. Try again!"
+    "wrong": "Not quite. {san} lets your opponent answer {reply}. Try again!",
+    "strong_answer": "a strong answer"
   },
   "phases": {
     "opening": "opening",
@@ -61,5 +62,11 @@
     "opponent": "your opponent's move",
     "neutral": "{color}'s move"
   },
-  "background": "BACKGROUND (general chess knowledge: borrow at most one idea if it fits this move, and never name a move from it)"
+  "background": "BACKGROUND (general chess knowledge: borrow at most one idea if it fits this move, and never name a move from it)",
+  "ask": {
+    "rules": "You are now answering a follow-up question from the player about this move. Answer only from FACTS and ASKED MOVES. If the facts do not cover the question, say so honestly and suggest trying the move on the board. If the question is not about chess, steer back to the game in one friendly sentence.",
+    "task": "The player asks: \"{question}\" Answer in 1 to 4 short sentences.",
+    "fallback": "I would have to invent variations to answer that, and fish don't lie. Try the move on the board and I'll check it with the engine.",
+    "offline": "My language bubble popped: the coach model is not reachable right now. The engine facts above still stand."
+  }
 }

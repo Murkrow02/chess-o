@@ -45,12 +45,23 @@ account, and without a chatbot inventing variations. chess-o keeps the two jobs 
 
 **Coach**
 - Streams token by token, prefetches the next moves, caches everything.
+- Ask follow-up questions under any explanation. Moves you name ("what about Nf4?") are
+  checked by the engine before Giacomino answers.
 - Draws on a local knowledge base built only from freely licensed texts (Wikipedia, Wikibooks'
   opening theory, public-domain classics by Capablanca and Lasker), plus any PDF or Markdown you
   add yourself. Sources are linked under each explanation.
 
 **Input**
 - Paste or drop a PGN, or import recent games by username from Lichess or Chess.com.
+- Link your Chess.com account: new games sync on their own with your side already set, and
+  "Review latest Chess.com game" fetches and opens the game you just finished. Chess.com only
+  offers OAuth to approved partners, so linking reads your public games by username; no password.
+
+**Everywhere**
+- English and Italian, switchable in the top bar; Giacomino answers in the same language.
+- Works on phones and installs as an app (PWA). Installing needs HTTPS, for example behind
+  your reverse proxy; over plain HTTP the app still works in the browser.
+- "Delete all data" on the Profile page wipes games, reviews, drills and the linked account.
 
 <table>
   <tr>
@@ -146,8 +157,9 @@ facts ─► retrieval (opening page by position, concepts by meaning) ─► pr
 - **Backend**: Python 3.12, FastAPI, python-chess, Stockfish 19, SQLite with sqlite-vec for
   games, the engine cache, drills and the knowledge base. No extra database container.
 - **Frontend**: React, Vite, TypeScript, chessground and chessops, Zustand. All UI text is in
-  [`frontend/src/locales/en.json`](frontend/src/locales/en.json) and the coach's wording in
-  [`backend/app/locales/en.json`](backend/app/locales/en.json), so a translation is two files.
+  [`frontend/src/locales/`](frontend/src/locales/) and the coach's wording in
+  [`backend/app/locales/`](backend/app/locales/), so a new language is two files; it appears in
+  the picker on its own.
 - **Serving**: nginx serves the app and proxies `/api` with buffering off for the
   Server-Sent Events. The frontend only uses relative URLs.
 

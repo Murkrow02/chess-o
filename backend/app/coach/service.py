@@ -56,13 +56,17 @@ class Coach:
             job.foreground = job.foreground or foreground
             return job
         if foreground:
-            for other in list(self.jobs.values()):
-                if not other.foreground and other.task and not other.tokens:
-                    other.task.cancel()  # a prefetch that has not started yet
+            self.cancel_prefetches()
         job = Job(key, foreground)
         self.jobs[key] = job
         job.task = asyncio.create_task(self._run(job, facts, kind, side))
         return job
+
+    def cancel_prefetches(self) -> None:
+        """Drop prefetches that have not produced a token yet: the player is waiting for something else."""
+        for other in list(self.jobs.values()):
+            if not other.foreground and other.task and not other.tokens:
+                other.task.cancel()
 
     async def _run(self, job: Job, facts: dict, kind: str, side: str | None) -> None:
         try:

@@ -98,7 +98,7 @@ def line_outcome(board: chess.Board, sans: list[str], color: str, plies: int = 4
 
 
 def facts_text(f: dict, player_side: str | None) -> str:
-    lab = load()["labels"]
+    lab = load("en")["labels"]  # the prompt itself stays English; only the answer is localized
     color, other = f["color"], ("black" if f["color"] == "white" else "white")
     before = chess.Board(f["fen_before"])
     after = chess.Board(f["fen_after"])
@@ -168,7 +168,7 @@ def build_messages(f: dict, kind: str, player_side: str | None, chunks: list[dic
     else:
         subject = loc["subjects"]["own" if f["color"] == player_side else "opponent"]
     task = loc["kinds"][kind].format(subject=subject, san=f["san"], best=f.get("best_move_san") or f["san"],
-                                     label=loc["labels"].get(f["classification"], f["classification"]))
+                                     label=load("en")["labels"].get(f["classification"], f["classification"]))
     parts += ["", "MOVES: " + ", ".join(dict.fromkeys(mention)), "", "TASK: " + task,
               loc["style"]["joke" if joke else "plain"]]
     return [{"role": "system", "content": system}, {"role": "user", "content": "\n".join(parts)}], allowed

@@ -1,0 +1,202 @@
+{
+  "app": {
+    "name": "chess-o",
+    "tagline": "Rivedi le tue partite con Giacomino, un pesce che vive nel motore.",
+    "language": "Italiano"
+  },
+  "nav": {
+    "review": "Analisi",
+    "drills": "Esercizi",
+    "profile": "Profilo",
+    "newGame": "Nuova partita",
+    "themeTitle": "Passa tra tema di sistema, chiaro e scuro",
+    "theme": {
+      "auto": "Tema: sistema",
+      "light": "Tema: chiaro",
+      "dark": "Tema: scuro"
+    },
+    "language": "Lingua"
+  },
+  "home": {
+    "title": "Quale partita guardiamo?",
+    "pasteTab": "Incolla PGN",
+    "importTab": "Importa da username",
+    "pgnPlaceholder": "Incolla qui un PGN, o trascina un file .pgn",
+    "upload": "Carica un file",
+    "analyze": "Analizza partita",
+    "site": "Sito",
+    "username": "Username",
+    "fetch": "Cerca partite",
+    "noGames": "Nessuna partita pubblica trovata per questo username.",
+    "recent": "Analizzate di recente",
+    "empty": "Ancora niente. Incolla qui sopra la tua prima partita.",
+    "youAre": "Hai giocato con",
+    "white": "Bianco",
+    "black": "Nero",
+    "neither": "Guardo e basta"
+  },
+  "analyzing": {
+    "scan": "Giacomino sta nuotando tra tutte le posizioni",
+    "deep": "Uno sguardo più profondo ai momenti chiave",
+    "done": "Fatto"
+  },
+  "summary": {
+    "title": "Analisi della partita",
+    "players": "Giocatori",
+    "accuracy": "Precisione",
+    "estimate": "Livello di gioco",
+    "estimateHint": "Stima approssimativa basata solo su questa partita",
+    "start": "Inizia l'analisi",
+    "keyMoments": "Rivedi i momenti chiave",
+    "opening": "Apertura",
+    "turn": " La partita è girata su {move}.",
+    "better": "Oggi il pesce più sveglio eri tu.",
+    "worse": "Stavolta il tuo avversario ha nuotato un po' più pulito.",
+    "close": "Partita tirata, pinna a pinna.",
+    "neutral": "Precisione {white} per il Bianco e {black} per il Nero."
+  },
+  "classes": {
+    "brilliant": "Geniale",
+    "great": "Ottima",
+    "best": "Migliore",
+    "excellent": "Eccellente",
+    "good": "Buona",
+    "book": "Teoria",
+    "inaccuracy": "Imprecisione",
+    "mistake": "Errore",
+    "miss": "Occasione persa",
+    "blunder": "Grave errore"
+  },
+  "verdict": {
+    "brilliant": "{san} è geniale",
+    "great": "{san} è un'ottima mossa",
+    "best": "{san} è la migliore",
+    "excellent": "{san} è eccellente",
+    "good": "{san} è buona",
+    "book": "{san} è teoria",
+    "inaccuracy": "{san} è un'imprecisione",
+    "mistake": "{san} è un errore",
+    "miss": "{san} è un'occasione persa",
+    "blunder": "{san} è un grave errore"
+  },
+  "review": {
+    "start": "Ecco la posizione iniziale. Premi la freccia destra e tuffiamoci.",
+    "retry": "Riprova",
+    "showBest": "Mostra migliore",
+    "hideBest": "Nascondi migliore",
+    "next": "Avanti",
+    "prev": "Indietro",
+    "hint": "Suggerimento",
+    "backToGame": "Torna alla partita",
+    "exploring": "Stai esplorando una variante",
+    "retryPrompt": "Tocca a te: trova una mossa migliore di {san}.",
+    "bestWas": "La migliore era {san}",
+    "keyMoment": "Momento chiave",
+    "summary": "Riepilogo",
+    "thinking": "Giacomino sta pensando",
+    "coachOffline": "Il coach è offline, quindi ecco la versione breve.",
+    "sources": "Dalla biblioteca",
+    "flip": "Gira la scacchiera",
+    "sound": "Suono",
+    "keyboard": "Le frecce scorrono la partita",
+    "first": "Prima mossa",
+    "last": "Ultima mossa",
+    "soundOn": "Suono attivo",
+    "soundOff": "Suono disattivato"
+  },
+  "drills": {
+    "title": "Il tuo mazzo di esercizi",
+    "intro": "Le posizioni in cui hai sbagliato tornano per un altro tentativo. La ripetizione dilazionata te le ripropone poco prima che tu le dimentichi.",
+    "due": "{n} da fare ora",
+    "none": "Niente da fare. Analizza una partita e i tuoi errori compariranno qui.",
+    "find": "Trova la mossa migliore per il {side}.",
+    "again": "Di nuovo",
+    "hard": "Difficile",
+    "good": "Bene",
+    "easy": "Facile",
+    "reveal": "Mostra soluzione",
+    "correct": "Esatto!",
+    "wrong": "Non è questa. Riprova o guarda la soluzione.",
+    "from": "Dalla tua partita contro {opponent}"
+  },
+  "profile": {
+    "title": "Dove perdi punti",
+    "intro": "Calcolato sulle partite che hai analizzato come giocatore.",
+    "byPhase": "Per fase di gioco",
+    "byTheme": "Per tema tattico",
+    "games": "Partite",
+    "avgAccuracy": "Precisione media",
+    "empty": "Analizza prima qualche tua partita, scegliendo con che colore hai giocato.",
+    "lost": "Punti persi per mossa",
+    "dataTitle": "I tuoi dati",
+    "dataIntro": "Elimina da questo server tutte le partite, le analisi, gli esercizi e l'account collegato. La cache del motore e la base di conoscenza restano, quindi non serve ricostruire nulla.",
+    "clear": "Elimina tutti i dati",
+    "clearConfirm": "Sì, elimina tutto",
+    "cancel": "Annulla",
+    "cleared": "Tutti i dati sono stati eliminati."
+  },
+  "errors": {
+    "pgn": "Impossibile leggere questo PGN: {message}",
+    "network": "Il server non risponde. Controlla che il backend sia attivo.",
+    "import": "Impossibile recuperare le partite: {message}",
+    "sync": "Impossibile sincronizzare con Chess.com: {message}",
+    "link": "Impossibile collegare l'account: {message}",
+    "clear": "Impossibile eliminare i dati: {message}"
+  },
+  "coach": {
+    "looks": "Giacomino sembra {mood}"
+  },
+  "phases": {
+    "opening": "Apertura",
+    "middlegame": "Mediogioco",
+    "endgame": "Finale"
+  },
+  "themes": {
+    "fork": "Forchetta",
+    "pin": "Inchiodatura",
+    "skewer": "Infilata",
+    "discovered attack": "Attacco di scoperta",
+    "discovered check": "Scacco di scoperta",
+    "back rank": "Ultima traversa",
+    "promotion": "Promozione",
+    "sacrifice": "Sacrificio",
+    "checkmate": "Scacco matto",
+    "castling": "Arrocco"
+  },
+  "chesscom": {
+    "linkTitle": "Collega il tuo account Chess.com",
+    "linkIntro": "Le tue nuove partite arrivano da sole, con il tuo colore già impostato. Vengono lette solo le partite pubbliche, senza password.",
+    "username": "Username Chess.com",
+    "link": "Collega account",
+    "synced": "Sincronizzato {when}",
+    "syncing": "Cerco nuove partite…",
+    "sync": "Sincronizza",
+    "unlink": "Scollega",
+    "unlinkTitle": "Interrompe la sincronizzazione. Le partite già importate restano.",
+    "justNow": "adesso",
+    "minutesAgo": "{n} min fa",
+    "hoursAgo": "{n} h fa",
+    "added": "{n} nuove partite importate.",
+    "upToDate": "Nessuna nuova partita dall'ultima sincronizzazione.",
+    "noGames": "Ancora nessuna partita. Giocane una su Chess.com e sincronizza.",
+    "win": "Vinta",
+    "loss": "Persa",
+    "draw": "Patta",
+    "vs": "contro {name}",
+    "notReviewed": "Da analizzare",
+    "more": "Mostra altre",
+    "speed": {
+      "bullet": "Bullet",
+      "blitz": "Blitz",
+      "rapid": "Rapid",
+      "daily": "Giornaliera"
+    },
+    "latest": "Analizza l'ultima partita Chess.com",
+    "fetchingLatest": "Recupero la tua ultima partita…"
+  },
+  "ask": {
+    "placeholder": "Chiedi a Giacomino di questa mossa",
+    "send": "Invia",
+    "failed": "La risposta si è persa nella corrente. Riprova."
+  }
+}
