@@ -86,7 +86,7 @@ You need Docker and an Ollama server (it can be the same machine).
 
 ```bash
 # on the Ollama machine
-ollama pull qwen3:4b-instruct-2507-q4_K_M
+ollama pull gemma4:e4b
 ollama pull bge-m3
 
 # here
@@ -110,9 +110,9 @@ All settings live in `.env` (git-ignored). The main ones:
 | Variable | Default | What it does |
 |---|---|---|
 | `LLM_BASE_URL` | | OpenAI-compatible endpoint, e.g. `http://ollama:11434/v1` |
-| `LLM_MODEL` | `qwen3:4b-instruct-2507-q4_K_M` | Coach model |
+| `LLM_MODEL` | `gemma4:e4b` | Coach model |
 | `LLM_API_KEY` | empty | For endpoints that need one |
-| `LLM_REASONING_EFFORT` | `none` | Turns off "thinking" on hybrid models such as Qwen3; leave empty if your server rejects it |
+| `LLM_REASONING_EFFORT` | `none` | Turns off "thinking" on hybrid models such as Gemma 4 and Qwen3; leave empty if your server rejects it |
 | `EMBED_BASE_URL`, `EMBED_MODEL` | `bge-m3` | Ollama used for the knowledge base |
 | `RAG_AUTO_INGEST` | `true` | Build the knowledge base on first start |
 | `ENGINE_WORKERS` | `0` | Stockfish processes; 0 means CPU cores minus one |
@@ -122,13 +122,16 @@ All settings live in `.env` (git-ignored). The main ones:
 | `CHESSO_HTTPS_PORT` | `8443` | Port of the web UI (HTTPS) |
 | `TLS_HOSTS` | `localhost,127.0.0.1` | Names and IPs in the HTTPS certificate |
 
-**Picking a model.** A 4B instruct model is the sweet spot on modest hardware: on an AMD 680M
-iGPU, `qwen3:4b-instruct-2507` starts answering in about a second and streams around
-22 tokens/s. 8B models write slightly better but were five times slower there. Whatever you pick,
-a context of 4096 tokens is enough; with Ollama you can bake it in:
+**Picking a model.** A small instruct model is the sweet spot on modest hardware. On an AMD 680M
+iGPU we compared Gemma 4 E4B, Qwen3 4B Instruct, Qwen3.5 4B and a 270M chess-commentary
+fine-tune on the same game facts, in English and Italian. Gemma 4 E4B starts answering in about
+two seconds, finishes an explanation in about four, and sticks closest to the facts; Qwen3 4B is
+smaller (2.5 GB against 6.6 GB) but invents more about the position, Qwen3.5 was much slower to
+start, and the 270M model misjudged moves. 8B models were five times slower there. Whatever you
+pick, a context of 4096 tokens is enough; with Ollama you can bake it in:
 
 ```bash
-printf 'FROM qwen3:4b-instruct-2507-q4_K_M\nPARAMETER num_ctx 4096\n' > Modelfile
+printf 'FROM gemma4:e4b\nPARAMETER num_ctx 4096\n' > Modelfile
 ollama create chesso-coach -f Modelfile   # then LLM_MODEL=chesso-coach
 ```
 

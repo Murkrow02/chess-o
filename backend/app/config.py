@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=(ROOT.parent / ".env", ROOT / ".env"), extra="ignore")
 
     llm_base_url: str = "http://localhost:11434/v1"
-    llm_model: str = "qwen3:4b-instruct-2507-q4_K_M"
+    llm_model: str = "gemma4:e4b"
     llm_api_key: str = ""
     llm_timeout: float = 60.0
     # Sent as `reasoning_effort` to turn off "thinking" on hybrid models (Qwen3); empty to omit.
