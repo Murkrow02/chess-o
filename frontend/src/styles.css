@@ -406,6 +406,13 @@ button.icon-only { padding: .45rem .6rem; }
 .navbar button { min-width: 44px; line-height: 1; padding: .5rem .6rem; }
 .navbar button.txt { min-width: 38px; color: var(--muted); background: none; padding-inline: .5rem; }
 .navbar button.txt:hover { color: var(--text); }
+.navbar button:has(.ahead) { position: relative; }
+.ahead { position: absolute; left: 50%; bottom: 3px; translate: -50% 0; display: flex; gap: 3px; pointer-events: none; }
+.ahead i { width: 5px; height: 5px; border-radius: 50%; border: 1px solid currentColor; opacity: .45; transition: background-color .4s, opacity .4s; }
+.ahead i.ready { background: currentColor; opacity: .9; }
+.ahead i.writing { opacity: .9; animation: ahead-bubble 1.1s ease-in-out infinite; }
+@keyframes ahead-bubble { 50% { translate: 0 -2px; background: currentColor; } }
+@media (prefers-reduced-motion: reduce) { .ahead i.writing { animation: none; background: currentColor; opacity: .6; } }
 
 /* ---------- progress ---------- */
 .progress { display: flex; flex-direction: column; gap: 14px; flex: 1; }

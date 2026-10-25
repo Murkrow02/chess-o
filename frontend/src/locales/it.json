@@ -102,7 +102,8 @@
     "first": "Prima mossa",
     "last": "Ultima mossa",
     "soundOn": "Suono attivo",
-    "soundOff": "Suono disattivato"
+    "soundOff": "Suono disattivato",
+    "ahead": "Giacomino ha letto avanti: pronte {n} delle prossime {total} mosse"
   },
   "drills": {
     "title": "Il tuo mazzo di esercizi",

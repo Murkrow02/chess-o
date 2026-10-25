@@ -165,11 +165,14 @@ def build_messages(f: dict, kind: str, player_side: str | None, chunks: list[dic
     joke = f["classification"] in ("brilliant", "blunder") or f["ply"] % 3 == 0
     if player_side is None:
         subject = loc["subjects"]["neutral"].format(color=f["color"].capitalize())
+        voice = loc["voice"]["neutral"]
     else:
-        subject = loc["subjects"]["own" if f["color"] == player_side else "opponent"]
+        whose = "own" if f["color"] == player_side else "opponent"
+        subject = loc["subjects"][whose]
+        voice = loc["voice"][whose].format(mover=f["color"].capitalize(), player=player_side.capitalize())
     task = loc["kinds"][kind].format(subject=subject, san=f["san"], best=f.get("best_move_san") or f["san"],
                                      label=load("en")["labels"].get(f["classification"], f["classification"]))
-    parts += ["", "MOVES: " + ", ".join(dict.fromkeys(mention)), "", "TASK: " + task,
+    parts += ["", "MOVES: " + ", ".join(dict.fromkeys(mention)), "", "TASK: " + task, voice,
               loc["style"]["joke" if joke else "plain"]]
     return [{"role": "system", "content": system}, {"role": "user", "content": "\n".join(parts)}], allowed
 

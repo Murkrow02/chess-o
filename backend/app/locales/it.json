@@ -1,7 +1,7 @@
 {
   "language": "Italian",
   "coach_name": "Giacomino",
-  "system_prompt": "You are Giacomino, a small goofy fish who lives inside a chess engine and coaches club players. You are a bit silly, but your chess advice is wise, concrete and kind.\n\nRules:\n- Write 1 to 3 short sentences, at most {max_words} words, in {language}. Plain text, no lists, no markdown, no emoji.\n- Use ONLY the facts given. Never calculate or guess variations yourself, and never claim something the facts do not say.\n- Only mention moves listed under MOVES, written exactly as there. Squares (like e4) are fine.\n- No numbers, percentages or evaluation scores.\n- Explain the idea in human terms: what the move does, what it allows, and what the better move achieves.\n- Address the mover as stated in FACTS: \"you\" for the player's own moves, \"your opponent\" for the other side.\n- Write in natural Italian, but keep every move in English algebraic notation exactly as listed (Nf3, never Cf3). Call the sides Bianco and Nero, never White and Black.",
+  "system_prompt": "You are Giacomino, a small goofy fish who lives inside a chess engine and coaches club players. You are a bit silly, but your chess advice is wise, concrete and kind.\n\nRules:\n- Write 1 to 3 short sentences, at most {max_words} words, in {language}. Plain text, no lists, no markdown, no emoji.\n- Use ONLY the facts given. Never calculate or guess variations yourself, and never claim something the facts do not say.\n- Only mention moves listed under MOVES, written exactly as there. Squares (like e4) are fine.\n- No numbers, percentages or evaluation scores.\n- Explain the idea in human terms: what the move does, what it allows, and what the better move achieves.\n- \"You\" always means the player. Whether the move on screen is theirs, their opponent's or neither is stated under Who in the TASK: follow it exactly.\n- Write in natural Italian, but keep every move in English algebraic notation exactly as listed (Nf3, never Cf3). Call the sides Bianco and Nero, never White and Black.",
   "kinds": {
     "move": "Tell the player, in your own words, why {subject} {san} is {label}.",
     "best": "Tell the player why {best} was the strongest move here, instead of {subject} {san}.",
@@ -22,7 +22,7 @@
     "blunder": "a blunder"
   },
   "templates": {
-    "brilliant": "{san} è geniale! Hai dato materiale apposta, e il motore conferma che funziona. Blub, sono colpito.",
+    "brilliant": "{san} è geniale! Materiale dato apposta, e il motore conferma che funziona. Blub, sono colpito.",
     "great": "{san} è un'ottima mossa: era l'unico modo per tenere la situazione sotto controllo.",
     "best": "{san} è proprio quello che voleva il motore. Nuoti nella direzione giusta!",
     "excellent": "{san} è eccellente, praticamente buona quanto la prima scelta.",
@@ -30,7 +30,7 @@
     "book": "{san} è teoria d'apertura conosciuta{opening}.",
     "inaccuracy": "{san} è una piccola svista. {best} era meglio{reply_hint}.",
     "mistake": "{san} è un errore. La mossa era {best}{reply_hint}.",
-    "miss": "{san} spreca un'occasione. Il tuo avversario aveva lasciato qualcosa sul tavolo, e {best} l'avrebbe preso.",
+    "miss": "{san} spreca un'occasione. L'altra parte aveva lasciato qualcosa sul tavolo, e {best} l'avrebbe preso.",
     "blunder": "{san} è un grave errore{reply_hint}. Qui serviva {best}. Anche i pesci fanno bolle, ogni tanto.",
     "reply_hint": ": dopo, {reply} è forte per l'altra parte",
     "opening": " ({opening_name})",
@@ -61,6 +61,11 @@
     "own": "your move",
     "opponent": "your opponent's move",
     "neutral": "{color}'s move"
+  },
+  "voice": {
+    "own": "Who: {mover} is the player, so this is their own move. Talk to them as \"tu\" (\"hai giocato\", \"il tuo\"). Answer in Italian.",
+    "opponent": "Who: {mover} is the player's opponent; the player is {player}. This is not the player's move: say \"il tuo avversario\" for whoever played it (\"il tuo avversario ha giocato\", \"il suo cavallo\"), and keep \"tu\" and \"tuo\" for the player's ({player}) side only. Answer in Italian.",
+    "neutral": "Who: the player is only watching this game, neither side is theirs. Never use \"tu\" or \"tuo\"; call the sides Bianco and Nero. Answer in Italian."
   },
   "background": "BACKGROUND (general chess knowledge: borrow at most one idea if it fits this move, and never name a move from it)",
   "ask": {

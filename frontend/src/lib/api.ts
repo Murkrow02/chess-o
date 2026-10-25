@@ -13,6 +13,8 @@ async function json<T>(res: Promise<Response>): Promise<T> {
 const post = (url: string, body: unknown) =>
   fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
 
+export type AheadState = "ready" | "writing" | "queued" | "idle";
+
 export const api = {
   createGame: (pgn: string) => json<GameInfo>(post("/api/games", { pgn })),
   game: (id: string) => json<Partial<Analysis> & { game: GameInfo }>(fetch(`/api/games/${id}`)),
@@ -32,6 +34,8 @@ export const api = {
   position: (fen: string, multipv = 3, depth?: number) =>
     json<{ lines: Line[] }>(post("/api/engine/position", { fen, multipv, depth })),
   setSide: (id: string, side: string | null) => json(post(`/api/games/${id}/side`, { side })),
+  ahead: (id: string, ply: number) =>
+    json<{ plies: number[]; states: AheadState[] }>(fetch(`/api/games/${id}/ahead/${ply}`)),
   hint: (id: string, ply: number, level: number) =>
     json<{ text: string; square?: string; piece_square?: string; uci?: string }>(fetch(`/api/games/${id}/hint/${ply}?level=${level}`)),
   retry: (id: string, ply: number, uci: string) =>

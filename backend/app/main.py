@@ -62,10 +62,10 @@ async def locale_from_cookie(request: Request, call_next):
         current_lang.reset(token)
 
 
-def coach_key(extra: str = "") -> str:
-    """Coach texts are cached per language: English keeps the bare key so old caches stay valid."""
+def coach_key(extra: str = "", side: str | None = None) -> str:
+    """Coach texts are cached per language and per side, since both change who "you" is."""
     code = current_locale()
-    return extra if code == "en" else f"{extra}|{code}"
+    return f"{extra}|{side or 'none'}|{code}"
 
 
 def sse(gen):
@@ -188,16 +188,30 @@ def _facts(gid: str, ply: int) -> dict:
         raise HTTPException(409, str(exc))
 
 
+LOOK_AHEAD = 3  # next moves explained in the background while the player reads
+
+
 @app.get("/api/games/{gid}/coach/{ply}")
-async def coach_move(gid: str, ply: int, kind: str = "move", prefetch: int = 2):
+async def coach_move(gid: str, ply: int, kind: str = "move", ahead: int = LOOK_AHEAD):
     if kind not in ("move", "best"):
         raise HTTPException(400, "kind must be move or best")
     facts = _facts(gid, ply)
     side = learning.get_side(gid)
     _, result = analysis.load_game(gid)
-    for nxt in range(ply + 1, min(ply + 1 + prefetch, len(result["facts"]) + 1)):
-        coach.prefetch((gid, nxt, "move", coach_key()), result["facts"][nxt - 1], "move", side)
-    return sse(coach.stream((gid, ply, kind, coach_key()), facts, kind, side))
+    coach.look_ahead([((gid, nxt, "move", coach_key(side=side)), result["facts"][nxt - 1], "move", side)
+                      for nxt in range(ply + 1, min(ply + 1 + min(ahead, LOOK_AHEAD), len(result["facts"]) + 1))])
+    return sse(coach.stream((gid, ply, kind, coach_key(side=side)), facts, kind, side))
+
+
+@app.get("/api/games/{gid}/ahead/{ply}")
+def coach_ahead(gid: str, ply: int):
+    """How far Giacomino has read ahead of the move on screen."""
+    _, result = analysis.load_game(gid)
+    if not result:
+        return {"plies": [], "states": []}
+    plies = list(range(ply + 1, min(ply + 1 + LOOK_AHEAD, len(result["facts"]) + 1)))
+    side = learning.get_side(gid)
+    return {"plies": plies, "states": coach.ahead([(gid, p, "move", coach_key(side=side)) for p in plies])}
 
 
 @app.get("/api/coach/explore")
@@ -209,7 +223,7 @@ async def coach_explore(fen: str, uci: str, side: str | None = None):
 
     async def run():
         yield {"event": "facts", "data": facts}
-        async for item in coach.stream(("explore", 0, "explore", coach_key(f"{fen}|{uci}")), facts, "explore", side):
+        async for item in coach.stream(("explore", 0, "explore", coach_key(f"{fen}|{uci}", side)), facts, "explore", side):
             yield item
     return sse(run())
 

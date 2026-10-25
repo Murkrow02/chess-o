@@ -1,13 +1,15 @@
-"""Coach generation: lazy, cached, streamed, validated, with background prefetch.
+"""Coach generation: lazy, cached, streamed, validated, with background look-ahead.
 
-One LLM job runs at a time (a small GPU serves one request fastest). A request for the
-move on screen cancels queued prefetches, and two requests for the same text share one job.
+One LLM job runs at a time (a small GPU serves one request fastest). Whatever the player is
+waiting for goes first; look-ahead for the next moves fills the GPU while they read, in move
+order. Two requests for the same text share one job.
 """
 
 import asyncio
 import json
 import logging
 from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 
 import httpx
 
@@ -28,6 +30,7 @@ class Job:
         self.tokens: list[str] = []
         self.final: str | None = None
         self.replaced = False
+        self.running = False  # holds the GPU
         self.offline = False
         self.sources: list[dict] = []
         self.changed = asyncio.Condition()
@@ -44,6 +47,8 @@ class Coach:
     def __init__(self):
         self.jobs: dict[tuple, Job] = {}
         self.gpu = asyncio.Lock()
+        self.urgent = 0  # foreground work holding or waiting for the GPU
+        self.queue: list[Job] = []  # look-ahead jobs waiting for an idle GPU, oldest first
 
     @staticmethod
     def cached(key: tuple) -> dict | None:
@@ -55,18 +60,45 @@ class Coach:
         if job:
             job.foreground = job.foreground or foreground
             return job
-        if foreground:
-            self.cancel_prefetches()
         job = Job(key, foreground)
         self.jobs[key] = job
         job.task = asyncio.create_task(self._run(job, facts, kind, side))
         return job
 
-    def cancel_prefetches(self) -> None:
-        """Drop prefetches that have not produced a token yet: the player is waiting for something else."""
-        for other in list(self.jobs.values()):
-            if not other.foreground and other.task and not other.tokens:
-                other.task.cancel()
+    @asynccontextmanager
+    async def slot(self, job: Job | None = None):
+        """The GPU. Look-ahead only takes it when nothing on screen is waiting, one job at a time in order."""
+        if job and not job.foreground:
+            self.queue.append(job)
+            try:
+                while not job.foreground and (self.urgent or self.gpu.locked() or self.queue[0] is not job):
+                    await asyncio.sleep(0.2)
+            finally:
+                self.queue.remove(job)
+            if not job.foreground:
+                await self.gpu.acquire()  # free and nobody waiting, so this returns at once
+                try:
+                    yield
+                finally:
+                    self.gpu.release()
+                return
+        self.urgent += 1
+        try:
+            async with self.gpu:
+                yield
+        finally:
+            self.urgent -= 1
+
+    def look_ahead(self, wanted: list[tuple[tuple, dict, str, str | None]]) -> None:
+        """Explain the next moves in the background, dropping look-ahead the player has moved away from."""
+        keep = {key for key, *_ in wanted}
+        game = {key[0] for key in keep}
+        for job in list(self.jobs.values()):
+            if not job.foreground and job.key[0] in game and job.key not in keep and job.task and not job.tokens:
+                job.task.cancel()
+        for key, facts, kind, side in wanted:
+            if key not in self.jobs and not self.cached(key):
+                self._start(key, facts, kind, side, foreground=False)
 
     async def _run(self, job: Job, facts: dict, kind: str, side: str | None) -> None:
         try:
@@ -74,7 +106,8 @@ class Coach:
             job.sources = [{"title": c["title"], "source": c["source"], "url": c.get("url"), "license": c.get("license")}
                            for c in chunks]
             messages, allowed = build_messages(facts, kind, side, chunks)
-            async with self.gpu:
+            async with self.slot(job):
+                job.running = True
                 text = tidy(await self._generate(job, messages, allowed, facts))
             job.final = text
             db.execute("INSERT OR REPLACE INTO coach_cache (game_id, ply, kind, extra, text, sources) VALUES (?,?,?,?,?,?)",
@@ -137,10 +170,14 @@ class Coach:
                 yield {"event": "done", "data": {}}
                 return
 
-    def prefetch(self, key: tuple, facts: dict, kind: str, side: str | None) -> None:
-        if key in self.jobs or self.cached(key):
-            return
-        self._start(key, facts, kind, side, foreground=False)
+    def ahead(self, keys: list[tuple]) -> list[str]:
+        """Where each look-ahead key stands: ready, writing, queued or idle."""
+        def state(key):
+            job = self.jobs.get(key)
+            if job:
+                return "writing" if job.running else "queued"
+            return "ready" if self.cached(key) else "idle"
+        return [state(k) for k in keys]
 
 
 coach = Coach()

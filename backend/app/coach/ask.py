@@ -68,15 +68,15 @@ async def answer(f: dict, side: str | None, question: str, history: list[dict]) 
             for h in history[-6:]]
     ask = loc["ask"]
     task = ask["task"].format(question=question)
-    content = messages[1]["content"].rsplit("\nTASK: ", 1)[0]
+    content, tail = messages[1]["content"].rsplit("\nTASK: ", 1)
+    voice = next((line for line in tail.splitlines() if line.startswith("Who: ")), "")
     content += ("\n\nMOVES ALSO ALLOWED: " + ", ".join(sorted(extra_moves)) if extra_moves else "")
     content += "\n\nCONVERSATION SO FAR\n" + "\n".join(talk) if talk else ""
     messages = [{"role": "system", "content": messages[0]["content"] + "\n" + ask["rules"]},
-                {"role": "user", "content": content + "\n\nTASK: " + task}]
+                {"role": "user", "content": content + "\n\nTASK: " + task + ("\n" + voice if voice else "")}]
 
     tokens: list[str] = []
-    coach.cancel_prefetches()
-    async with coach.gpu:
+    async with coach.slot():
         try:
             async for token in llm.stream_chat(messages, max_tokens=200, temperature=0.4):
                 tokens.append(token)

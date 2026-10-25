@@ -5,7 +5,7 @@ import { Chess } from "chessops/chess";
 import { parseFen } from "chessops/fen";
 import { parseSan } from "chessops/san";
 import { makeUci } from "chessops/util";
-import { api } from "../lib/api";
+import { api, type AheadState } from "../lib/api";
 import { evalLabel, uciSquares } from "../lib/chess";
 import { t } from "../lib/i18n";
 import { playMove, playVerdict, setSound, soundOn } from "../lib/sound";
@@ -258,6 +258,29 @@ function Actions({ f }: { f?: Facts }) {
   );
 }
 
+/** Bubbles under the Next button: how many of the next moves Giacomino has already explained. */
+function Ahead({ id, ply }: { id: string; ply: number }) {
+  const [states, setStates] = useState<AheadState[]>([]);
+  useEffect(() => {
+    let live = true;
+    let timer = 0;
+    const poll = () => api.ahead(id, ply).then((r) => {
+      if (!live) return;
+      setStates(r.states);
+      if (r.states.some((x) => x !== "ready")) timer = window.setTimeout(poll, 1500);
+    }).catch(() => undefined);
+    timer = window.setTimeout(poll, 400);  // the coach request for this move queues the look-ahead first
+    return () => { live = false; clearTimeout(timer); };
+  }, [id, ply]);
+  if (!states.length) return null;
+  const ready = states.filter((x) => x === "ready").length;
+  return (
+    <span className="ahead" title={t("review.ahead", { n: ready, total: states.length })}>
+      {states.map((x, i) => <i key={i} className={x} />)}
+    </span>
+  );
+}
+
 function NavBar() {
   const s = useStore();
   const n = s.game?.moves.length ?? 0;
@@ -266,7 +289,9 @@ function NavBar() {
     <div className="navbar">
       <button aria-label={t("review.first")} onClick={() => s.setPly(0)}><Icon name="first" /></button>
       <button aria-label={t("review.prev")} onClick={() => s.step(-1)}><Icon name="prev" /></button>
-      <button aria-label={t("review.next")} onClick={() => (s.mode === "summary" ? (s.setMode("review"), s.setPly(1)) : s.step(1))}><Icon name="fwd" /></button>
+      <button aria-label={t("review.next")} onClick={() => (s.mode === "summary" ? (s.setMode("review"), s.setPly(1)) : s.step(1))}>
+        <Icon name="fwd" />{s.game && s.analysis && s.mode === "review" && <Ahead id={s.game.id} ply={s.ply} />}
+      </button>
       <button aria-label={t("review.last")} onClick={() => s.setPly(n)}><Icon name="last" /></button>
       <span className="spacer" />
       {s.analysis && s.mode !== "summary" && <button className="txt" title={t("review.summary")} aria-label={t("review.summary")} onClick={() => s.setMode("summary")}><Icon name="list" /></button>}
